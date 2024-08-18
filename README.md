@@ -57,9 +57,9 @@ But I can helas overflow an integer.
 ## What is NaN 
 NaN (Not a Number) is a special floating-point value used to represent undefined or non-representable results in mathematical operations. It can occur due to various reasons, such as:
 - Division by zero: 0.0 / 0.0
-- Square root of a negative number: $sqrt(-1.0)$
+- Square root of a negative number: `sqrt(-1.0)`
 - Operations involving infinity: infinity + infinity, infinity - infinity
-- Certain trigonometric functions with invalid arguments $ atan2(0, 0)$
+- Certain trigonometric functions with invalid arguments `atan2(0, 0)`
 
 ### Generating NaN:
 
@@ -95,8 +95,8 @@ Result: nan
 ```
 
 ### Remember:
-- std::nan() creates a NaN value.
-- The std::isnan() function can be used to check if a value is NaN.
+- `std::nan()` creates a NaN value.
+- The `std::isnan()` function can be used to check if a value is NaN.
 - Arithmetic operations involving NaN usually result in NaN.
 - NaN values are often used to indicate error conditions or undefined results.
 - NaN values are not equal to themselves. Comparing a NaN value with itself using == will always return false.
@@ -184,6 +184,7 @@ std::cout << "x: " << x << std::endl; // Undefined behavior: the value of x is n
 std::cout << "*q: " << *q << std::endl; // Undefined behavior: the value of *q is not guaranteed to be 24
 ```
 
+## ex00 - Conversion of scalar types
 
-
-## ex00
+>Write a class ScalarConverter that will contain only one static methods "convert" that will takes as parameter a string representation of a C++ literal in its most common form and output its value in the following serie of scalar types : char, int, float, double.  
+As this class doesn’t need to store anything at all, this class must not be instanciable by users. You have to first detect the type of the literal passed as parameter, convert it from string to its actual type, then convert it explicitly to the three other data types.  
