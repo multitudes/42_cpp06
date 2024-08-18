@@ -255,9 +255,33 @@ bool isInteger(const std::string& str) {
 but really There is a better way using the limits header.
 ```cpp
 bool isInteger(const std::string& str) {
+
  	char* endptr;
     long long value = std::strtoll(str.c_str(), &endptr, 10);
 
     return *endptr == '\0' && errno == 0 && (value >= INT_MIN && value <= INT_MAX);
+}
+```
+But this was not enough. There is a mistake in the previous code. The `errno` is not reset to 0 before the call to `strtoll()`.  And moreover the double is cast to a long long but a double can be much bigger so who can tell me if the long long would overflow? There is a small trick. A float would fit in a long long so I can cast the double to a float and if this produces an `inf` then I know that the double was too big for my int anyway. if the cast to float succeeded then I can cast the float to a long long and check if it is in the range of an int.
+```cpp
+static bool is_int(const std::string& str) {
+	errno = 0;
+	char* endptr;
+	if (isinf(std::strtof(str.c_str(), &endptr)) || isnan(std::strtof(str.c_str(), &endptr))) {
+		return false;
+	}
+    long long value = std::strtoll(str.c_str(), &endptr, 10);
+    return *endptr == '\0' && errno == 0 && (value >= INT_MIN && value <= INT_MAX);
+} 
+```
+Another problem was that passing a `nan` to the `strtof()` is undefined behaviour. So I need to check for this too, with `isnan()`.
+
+For floats I would use the same but keeping in mind that `strtof` and `strtod` will set the errno to the value of 34 if the conversion is out of range or `inf` or `nan`. But I do accept `inf` and `nan` as valid floats. So I remove the check for `errno == 0`. Also I consider floats strings that are ending with an `f`. Otherwise I consider them doubles. `nanf` and `inff` are valid floats.  `nan` and `inf` are valid doubles.
+So:
+```cpp
+static bool is_float(const std::string& str) {
+  	char* endptr;
+	std::strtof(str.c_str(), &endptr);
+    return *endptr == 'f';
 }
 ```
