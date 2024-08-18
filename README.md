@@ -207,3 +207,30 @@ int: 42
 float: 42.0f
 double: 42.0
 ```
+
+### Learned
+The most interesting I learned from this exercise is that I can pass `inf` and `nan` to a double or float and it will be handled correctly.  See above for the limits...
+This means that I do not need to handle a string with hardcoded values for `inf` and `nan` as I can just pass them as a string to the float or double conversion function and it will be handled correctly.
+For float conversion I will use:
+```cpp
+float f = std::strtof(str.c_str(), &endptr);
+```
+And for doubles:
+```cpp
+double d = std::strtod(str.c_str(), &endptr);
+```
+The `endptr` is a pointer to a char that will be set to the first character that is not part of the number. This is for error checking.  
+Both functions will return 0.0 if the conversion fails. Therefore I need to check for the error to see if I am out of range.
+
+Example:
+```cpp
+float f = std::strtof(str.c_str(), &endptr);
+
+```
+
+`strtod()` will return `std::numeric_limits<double>::infinity()` (or `inf`) when the input string represents a number that is too large to be represented as a finite double value. This is often referred to as overflow.
+
+Similarly, `strtod()` will return `-std::numeric_limits<double>::infinity()` (or -inf) when the input string represents a number that negative and too large to be represented as a finite double value. This is referred to as underflow.
+
+Same for the floats. The `strtof()` will return `std::numeric_limits<float>::infinity()` (or `inf`) when the input string represents a number that is too large to be represented as a finite float value. This is often referred to as overflow. But as alias I can pass `inff` and -inff` to the float conversion function.
+
