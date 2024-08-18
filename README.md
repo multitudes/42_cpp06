@@ -188,3 +188,22 @@ std::cout << "*q: " << *q << std::endl; // Undefined behavior: the value of *q i
 
 >Write a class ScalarConverter that will contain only one static methods "convert" that will takes as parameter a string representation of a C++ literal in its most common form and output its value in the following serie of scalar types : char, int, float, double.  
 As this class doesn’t need to store anything at all, this class must not be instanciable by users. You have to first detect the type of the literal passed as parameter, convert it from string to its actual type, then convert it explicitly to the three other data types.  
+
+Example:
+```
+./convert 0
+char: Non displayable
+int: 0
+float: 0.0f
+double: 0.0
+./convert nan
+char: impossible
+int: impossible
+float: nanf
+double: nan
+./convert 42.0f
+char: '*'
+int: 42
+float: 42.0f
+double: 42.0
+```
