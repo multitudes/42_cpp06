@@ -234,3 +234,30 @@ Similarly, `strtod()` will return `-std::numeric_limits<double>::infinity()` (or
 
 Same for the floats. The `strtof()` will return `std::numeric_limits<float>::infinity()` (or `inf`) when the input string represents a number that is too large to be represented as a finite float value. This is often referred to as overflow. But as alias I can pass `inff` and -inff` to the float conversion function.
 
+## is this an INT? a naive check and a better one
+How to check if a string is an integer in C++?  
+Naively and because I come from C I would check if the string is an Int by checking if the characters are all digits.  
+```cpp
+bool isInteger(const std::string& str) {
+	std::string::size_type start = 0;
+	if (str[0] == '-' || str[0] == '+') {
+		start = 1;
+	}
+	for (std::string::size_type i = start; i < str.length(); i++) {
+		if (!isdigit(str[i])) {
+			return false;
+		}
+	}
+	return true;
+}
+
+```
+but really There is a better way using the limits header.
+```cpp
+bool isInteger(const std::string& str) {
+ 	char* endptr;
+    long long value = std::strtoll(str.c_str(), &endptr, 10);
+
+    return *endptr == '\0' && errno == 0 && (value >= INT_MIN && value <= INT_MAX);
+}
+```
