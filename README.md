@@ -52,7 +52,7 @@ Negative integer infinity (just int min): -2147483648
 ```
 
 Surprisingly I cannot overlof a float or double, it will just return infinity.  
-But if I can helas overflow an integer.
+But I can helas overflow an integer.
 
 ## What is NaN 
 NaN (Not a Number) is a special floating-point value used to represent undefined or non-representable results in mathematical operations. It can occur due to various reasons, such as:
