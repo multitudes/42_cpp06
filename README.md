@@ -285,3 +285,31 @@ static bool is_float(const std::string& str) {
     return *endptr == 'f';
 }
 ```
+Ops the above again was too simplistic... depending of the implementations the `strtof()` will not accept the 'f' at the end as part of the float? Also what if I pass ff or fff? I am ok if is an out of bound float.
+```cpp
+// updated implementation
+static bool is_float(const std::string& str) {
+	errno = 0;
+  	char* endptr;
+
+	// has to end with f
+    if (str[str.size() - 1] != 'f') {
+        return false;
+	}
+
+	// once the above is checked we can remove the f but str is a const so we need to create a copy
+	std::string modified_str = str.substr(0, str.size() - 1);
+	// if there is nothing left after removing the f something is fishy
+	if (modified_str.empty()) {
+        return false;
+    }
+	// verify that the string is a valid float/dounle
+	float value = std::strtof(modified_str.c_str(), &endptr);
+
+	// is the string a valid float then would not have any other chars in it
+    if (*endptr != '\0') {
+        return false;
+    }
+	return true;
+}
+```
