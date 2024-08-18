@@ -5,14 +5,14 @@ The <limits> header was introduced in C++98 and provides information about the l
 
 Key constants and their meanings:
 
-- numeric_limits<T>::min(): Returns the minimum value representable by the type T.
-- numeric_limits<T>::max(): Returns the maximum value representable by the type T.
-- numeric_limits<T>::lowest(): Returns the most negative value representable by the type T.
-- numeric_limits<T>::digits(): Returns the number of base-2 digits in the significand of the type T.
-- numeric_limits<T>::digits10(): Returns the number of base-10 digits in the significand of the type T.
-- numeric_limits<T>::is_integer(): Returns true if the type T is an integer type.
-- numeric_limits<T>::is_signed(): Returns true if the type T is signed.
-- numeric_limits<T>::is_specialized(): Returns true if the numeric_limits template is specialized for the type T.
+- `numeric_limits<T>::min()`: Returns the minimum value representable by the type T.
+- `numeric_limits<T>::max()`: Returns the maximum value representable by the type T.
+- `numeric_limits<T>::lowest()`: Returns the most negative value representable by the type T.
+- `numeric_limits<T>::digits()`: Returns the number of base-2 digits in the significand of the type T.
+- `numeric_limits<T>::digits10()`: Returns the number of base-10 digits in the significand of the type T.
+- `numeric_limits<T>::is_integer()`: Returns true if the type T is an integer type.
+- `numeric_limits<T>::is_signed()`: Returns true if the type T is signed.
+- `numeric_limits<T>::is_specialized()`: Returns true if the numeric_limits template is specialized for the type T.
 
 From here we can test the limits of the types we are gonna use in the exercises.
 
@@ -54,6 +54,58 @@ Negative integer infinity (just int min): -2147483648
 Surprisingly I cannot overlof a float or double, it will just return infinity.  
 But if I can helas overflow an integer.
 
+## What is NaN 
+NaN (Not a Number) is a special floating-point value used to represent undefined or non-representable results in mathematical operations. It can occur due to various reasons, such as:
+- Division by zero: 0.0 / 0.0
+- Square root of a negative number: $sqrt(-1.0)$
+- Operations involving infinity: infinity + infinity, infinity - infinity
+- Certain trigonometric functions with invalid arguments (e.g., $atan2(0, 0)$)
+
+Generating NaN:
+
+C++ provides the nan() function in the <cmath> header to create NaN values. It takes an optional string argument that can be used to distinguish different NaN values (implementation-specific).
+
+Example:
+C++
+
+#include <iostream>
+#include <cmath>
+
+int main() {
+    float nan_value = std::nanf("invalid"); // Create a NaN value
+
+    // Check if the value is NaN
+    if (std::isnan(nan_value)) {
+        std::cout << "Value is NaN" << std::endl;
+    } else {
+        std::cout << "Value is not NaN" << std::endl;
+    }
+
+    // Operations with NaN
+    float result = 10.0 / nan_value;
+    std::cout << "Result: " << result << std::endl; // Output: NaN
+
+    return 0;
+}
+
+Use code with caution.
+
+Output:
+
+Value is NaN
+Result: nan
+
+Key Points:
+
+    std::nan() creates a NaN value.
+    The std::isnan() function can be used to check if a value is NaN.
+    Arithmetic operations involving NaN usually result in NaN.
+    NaN values are often used to indicate error conditions or undefined results.
+
+Remember:
+
+    NaN values are not equal to themselves. Comparing a NaN value with itself using == will always return false.
+    To check if a value is NaN, use std::isnan().
 
 ## casting values to different types
 We are going to practice casts in C++.  
