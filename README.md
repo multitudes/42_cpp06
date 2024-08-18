@@ -56,12 +56,86 @@ But if I can helas overflow an integer.
 
 
 ## casting values to different types
-We are going to practice casts in C++. First of all we need to know what a re the limits of the types we are going to use. We can use the `limits` library to get the limits of the types.
+We are going to practice casts in C++.  
 
-Example:
+### Promotion casting
+It occurs **automatically** in C++ when a value of a narrower data type is used in an expression with a wider data type.  
+In general doesnt lose information except for some cases of large integer to floating point.
+Example: 
+- Integer promotion: When an integer type (e.g., char, short, int) is used in an expression with a wider integer type (e.g., long, long long), the narrower type is promoted to the wider type.  
+- Floating-point promotion: When a floating-point type (e.g., float) is used in an expression with a wider floating-point type (e.g., double, long double), the narrower type is promoted to the wider type.
+- Integral promotion to floating-point: When an integer type is used in an expression with a floating-point type, the integer type is promoted to the floating-point type. This can result in a loss of precision if the integer type has more significant digits than the floating-point type can represent!
+
 ```cpp
-#include <limits>
-#include <iostream>
+	int i = 42;
+	long l = i; // implicit promotion from int to long
+	float d = i; // implicit promotion from int to float - might be lossy
+```
+### Demotion casting
+Generally not recommended, as it can result in loss of information or precision. Ex a float to int cast will truncate the decimal part of the float.  
+```cpp
+	double d = 3.14;
+	int i = d; // implicit demotion from double to int - lossy
+```
+
+## Explicit casting
+C++ provides several casting operators to convert values from one data type to another. Here's a breakdown of the most common ones:
+
+### Static Cast `static_cast<T>(expr)`:
+
+- Similar to the C style cast `(T)expr`, but with additional type checking at compile time and the advantage of a clear syntax.
+
+### C-Style Cast `(T)expr`:
+- The one we know and love :) 
+    
+### Dynamic Cast `dynamic_cast<T>(expr)`:
+- Used for runtime type identification and safe downcasting.
+- Only works with polymorphic types (classes with virtual functions).
+- Returns nullptr if the cast is unsuccessful.
+
+### Reinterpret Cast (reinterpret_cast<T>(expr)):
+
+- Used for low-level type conversions, such as reinterpreting an integer as a pointer.
+
+### Const Cast (const_cast<T>(expr)):
+
+- Used to remove or add the const qualifier from a variable.
+
+Examples:
+```cpp
+int x = 10;
+double y = static_cast<double>(x); // Convert int to double
+char c = (char)x; // C-style cast
+
+int* ptr = new int[10];
+void* voidPtr = reinterpret_cast<void*>(ptr);
+
+const int z = 5;
+int* mutableZ = const_cast<int*>(z); // Remove const qualifier - requires a pointer as input
+```
+
+## Undefined behavior by casting
+There are things to be carefule when casting values.
+Example with reinterpret casting:
+```cpp
+reinterpret_cast<int*>(0); // Undefined behavior: dereferencing a null pointer
+// or
+int* intPtr = new int;
+char* charPtr = reinterpret_cast<char*>(intPtr); // Undefined behavior: accessing an object through a pointer of a different type
+```
+
+Interestingly the `const_cast` can have unexpected behaviour too. Lets see this:
+```cpp
+const int x = 42; // x is a constant integer
+const int* p = &x; // p is a pointer to a constant integer
+
+int* q = const_cast<int*>(p); // Remove const qualifier from p
+
+*q = 24; // Attempt to modify the value of x through q
+
+std::cout << "x: " << x << std::endl; // Undefined behavior: the value of x is not guaranteed to be 24
+std::cout << "*q: " << *q << std::endl; // Undefined behavior: the value of *q is not guaranteed to be 24
+```
 
 
 
