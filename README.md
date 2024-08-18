@@ -17,25 +17,25 @@ Key constants and their meanings:
 From here we can test the limits of the types we are gonna use in the exercises.
 
 ```cpp
-	std::cout << "Limit checks -----------------"  << std::endl;
-	float inf = std::numeric_limits<float>::infinity();
-    double inf_double = std::numeric_limits<double>::infinity();
-	float nan = std::numeric_limits<float>::quiet_NaN();
-	double nan_double = std::numeric_limits<double>::quiet_NaN();
+std::cout << "Limit checks -----------------"  << std::endl;
+float inf = std::numeric_limits<float>::infinity();
+double inf_double = std::numeric_limits<double>::infinity();
+float nan = std::numeric_limits<float>::quiet_NaN();
+double nan_double = std::numeric_limits<double>::quiet_NaN();
 
-    std::cout << "Positive infinity for float: " << inf << std::endl;
-    std::cout << "Positive infinity for double: " << inf_double << std::endl;
-	std::cout << "Negative infinity for float: " << -inf << std::endl;
-	std::cout << "Negative infinity for double: " << -inf_double << std::endl;
+std::cout << "Positive infinity for float: " << inf << std::endl;
+std::cout << "Positive infinity for double: " << inf_double << std::endl;
+std::cout << "Negative infinity for float: " << -inf << std::endl;
+std::cout << "Negative infinity for double: " << -inf_double << std::endl;
 
-	std::cout << "NaN for float: " << nan << std::endl;
-	std::cout << "NaN for double: " << nan_double << std::endl;
+std::cout << "NaN for float: " << nan << std::endl;
+std::cout << "NaN for double: " << nan_double << std::endl;
 
-    // Trying to use infinity with an integer will result in undefined behavior
-    int int_inf = std::numeric_limits<int>::max(); // This will give the maximum int value
-	int neg_int_inf = std::numeric_limits<int>::min(); // This will give the minimum int value
-	std::cout << "Integer infinity (just int max): " << int_inf << std::endl;
-	std::cout << "Negative integer infinity (just int min): " << neg_int_inf << std::endl;
+// Trying to use infinity with an integer will result in undefined behavior
+int int_inf = std::numeric_limits<int>::max(); // This will give the maximum int value
+int neg_int_inf = std::numeric_limits<int>::min(); // This will give the minimum int value
+std::cout << "Integer infinity (just int max): " << int_inf << std::endl;
+std::cout << "Negative integer infinity (just int min): " << neg_int_inf << std::endl;
 
 ```
 The above will print 
@@ -61,12 +61,12 @@ NaN (Not a Number) is a special floating-point value used to represent undefined
 - Operations involving infinity: infinity + infinity, infinity - infinity
 - Certain trigonometric functions with invalid arguments (e.g., $atan2(0, 0)$)
 
-Generating NaN:
+### Generating NaN:
 
-C++ provides the nan() function in the <cmath> header to create NaN values. It takes an optional string argument that can be used to distinguish different NaN values (implementation-specific).
+C++ provides the `nan()` function in the <cmath> header to create NaN values. It takes an optional string argument that can be used to distinguish different NaN values (implementation-specific).
 
 Example:
-C++
+```C++
 
 #include <iostream>
 #include <cmath>
@@ -87,28 +87,23 @@ int main() {
 
     return 0;
 }
-
-Use code with caution.
-
+```
 Output:
-
+```
 Value is NaN
 Result: nan
+```
 
-Key Points:
-
-    std::nan() creates a NaN value.
-    The std::isnan() function can be used to check if a value is NaN.
-    Arithmetic operations involving NaN usually result in NaN.
-    NaN values are often used to indicate error conditions or undefined results.
-
-Remember:
-
-    NaN values are not equal to themselves. Comparing a NaN value with itself using == will always return false.
-    To check if a value is NaN, use std::isnan().
+### Remember:
+- std::nan() creates a NaN value.
+- The std::isnan() function can be used to check if a value is NaN.
+- Arithmetic operations involving NaN usually result in NaN.
+- NaN values are often used to indicate error conditions or undefined results.
+- NaN values are not equal to themselves. Comparing a NaN value with itself using == will always return false.
+- To check if a value is NaN, use `std::isnan()`.
 
 ## casting values to different types
-We are going to practice casts in C++.  
+In this module we are going to practice casts in C++.  
 
 ### Promotion casting
 It occurs **automatically** in C++ when a value of a narrower data type is used in an expression with a wider data type.  
