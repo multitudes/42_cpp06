@@ -59,7 +59,7 @@ NaN (Not a Number) is a special floating-point value used to represent undefined
 - Division by zero: 0.0 / 0.0
 - Square root of a negative number: $sqrt(-1.0)$
 - Operations involving infinity: infinity + infinity, infinity - infinity
-- Certain trigonometric functions with invalid arguments (e.g., $atan2(0, 0)$)
+- Certain trigonometric functions with invalid arguments $ atan2(0, 0)$
 
 ### Generating NaN:
 
