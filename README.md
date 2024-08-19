@@ -317,3 +317,68 @@ static bool is_float(const std::string& str) {
 So I found out that i did not have to hardcode the inf and nan values passed in the converter if i pass them to the float or double conversion functions. The values are not supposed to be char or int anyway.  
 
 The order nmaters though, so i check if int or char first (char being a substype kind of int) and then if it is a float or double.
+
+### INT overflow? 
+
+Checking for INT overflow above I used the trick to convert my interger to long long:
+```cpp
+static bool is_int(const std::string& str) {
+	[...]
+    long long value = std::strtoll(str.c_str(), &endptr, 10);
+    return *endptr == '\0' && errno == 0 && (value >= INT_MIN && value <= INT_MAX);
+}  
+```
+but in the subject they really say this:
+> Allowed functions : Any function to convert from a string to an int, a float or a double. This will help, but won’t do the whole job...
+
+Ok... Ah these tricky subjects at 42... So apparently using strtoll ia not allowed? I can do without!
+
+I was thinking to convert my string to a double and then check for the overflow. But does my double have enough precision? We can print the precision of a float and a double with the following code:
+```cpp
+std::cout << "Precision of float: " << std::numeric_limits<float>::digits10 << std::endl;
+std::cout << "Precision of double: " << std::numeric_limits<double>::digits10 << std::endl;
+```
+So a float has a precision of 6 digits! My int_max has 10 digits, hehe, so this is not working. But a double has 15 digits precision. So I can convert my string to a double and then check if it is in the range of an int.  
+I print the INT_MAX and INT_MAX -1 converted to a double and a float...
+```cpp
+double value = std::strtod(mystr.c_str(), &endptr);
+double value2 = std::strtod(mystr2.c_str(), &endptr);
+std::cout << std::fixed << std::setprecision(0) << "Value overflow: " << value << std::endl;
+std::cout << std::fixed << std::setprecision(0) <<"Value2 not overflow: " << value2 << std::endl;
+std::cout << "Precision of double: " << std::numeric_limits<double>::digits10 << std::endl;
+
+float value3 = std::strtof(mystr.c_str(), &endptr);
+float value4 = std::strtof(mystr2.c_str(), &endptr);
+std::cout << std::fixed << std::setprecision(0) << "Value overflow: " << value3 << std::endl;
+std::cout << std::fixed << std::setprecision(0) <<"Value2 not overflow: " << value4 << std::endl;
+std::cout << "Precision of float: " << std::numeric_limits<float>::digits10 << std::endl;
+```
+and get:
+```
+// for a double (it is working!)
+Value overflow: 2147483648
+Value2 not overflow: 2147483647
+Precision of double: 15
+// for a float (it is not working!)
+Value overflow: 2147483648
+Value2 not overflow: 2147483648
+Precision of float: 6
+```
+
+So my updated implementation for the overflow check is some kind of:
+```cpp
+...
+	// check if the string is an integer
+    double converted_double = std::strtod(str.c_str(), &endptr);
+	// check if I am in the range for int
+    if (*endptr == '\0' && errno == 0 && \
+		(converted_double >=  std::numeric_limits<int>::min() && \
+		converted_double <=  std::numeric_limits<int>::max())) {
+			...
+	}
+```
+
+And this should make even the most pedantic evaluators here happy :)
+
+
+## ex01 - Conversion of scalar types
