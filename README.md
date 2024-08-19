@@ -184,7 +184,7 @@ std::cout << "x: " << x << std::endl; // Undefined behavior: the value of x is n
 std::cout << "*q: " << *q << std::endl; // Undefined behavior: the value of *q is not guaranteed to be 24
 ```
 
-## ex00 - Conversion of scalar types
+# ex00 - static_cast
 
 >Write a class ScalarConverter that will contain only one static methods "convert" that will takes as parameter a string representation of a C++ literal in its most common form and output its value in the following serie of scalar types : char, int, float, double.  
 As this class doesn’t need to store anything at all, this class must not be instanciable by users. You have to first detect the type of the literal passed as parameter, convert it from string to its actual type, then convert it explicitly to the three other data types.  
@@ -381,4 +381,44 @@ So my updated implementation for the overflow check is some kind of:
 And this should make even the most pedantic evaluators here happy :)
 
 
-## ex01 - Conversion of scalar types
+# ex01 - reinterpret_cast
+
+The subject:
+>Implement a class Serializer, who will not be initializable by the user by any way,
+with the following static methods:  
+`uintptr_t serialize(Data* ptr);  `
+It takes a pointer and converts it to the unsigned integer type uintptr_t.  
+`Data* deserialize(uintptr_t raw);`
+It takes an unsigned integer parameter and converts it to a pointer to Data.
+
+Serialization is the process of converting an object's state into a format that can be stored or transmitted. This format is often a sequence of bytes, which can be easily written to a file, sent over a network, or stored in memory.  
+
+The goal of serialization is to preserve the object's data and its structure so that it can be reconstructed later in the same or a different process. This is essential for tasks like saving data to disk, sending data over a network, or passing objects between different parts of a program.  
+
+In this exercise we use `reinterpret_cast` to convert a pointer to an integer value and vice versa. Not a difficult exercise, but to understand why we need to reinterptret_cast... the static_cast would npot be allowed in this case.  
+In C we would just cast. But in cpp everything has become more nuanced. To cast my data pointer:
+```c
+// in C
+(uintptr_t)data;
+```
+and in cpp we need to use reinterpret_cast:
+```cpp
+reinterpret_cast<uintptr_t>(data);
+```
+
+# ex02 - dynamic_cast
+
+> mplement a Base class that has a public virtual destructor only. Create three empty
+classes A, B and C, that publicly inherit from Base. Implement the following functions:
+Base * generate(void);
+It randomly instanciates A, B or C and returns the instance as a Base pointer. Feel free
+to use anything you like for the random choice implementation.
+void identify(Base* p);
+It prints the actual type of the object pointed to by p: "A", "B" or "C".
+void identify(Base& p);
+It prints the actual type of the object pointed to by p: "A", "B" or "C". Using a pointer
+inside this function is forbidden.
+Including the typeinfo header is forbidden.
+
+This was farly straightforward. I have a base class `Base` and three derived classes `A`, `B` and `C`. 
+`dynamic_cast` is especially made for polymorphic classes. It is used to convert a pointer or reference to a base class to a pointer or reference to a derived class. If the conversion is not possible, it returns a null pointer in the case of a pointer, or throws an exception in the case of a reference.   
