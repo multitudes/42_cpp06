@@ -313,3 +313,7 @@ static bool is_float(const std::string& str) {
 	return true;
 }
 ```
+
+So I found out that i did not have to hardcode the inf and nan values passed in the converter if i pass them to the float or double conversion functions. The values are not supposed to be char or int anyway.  
+
+The order nmaters though, so i check if int or char first (char being a substype kind of int) and then if it is a float or double.
