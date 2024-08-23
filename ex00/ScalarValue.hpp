@@ -6,7 +6,7 @@
 /*   By: lbrusa <lbrusa@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 17:19:13 by lbrusa            #+#    #+#             */
-/*   Updated: 2024/08/19 18:08:44 by lbrusa           ###   ########.fr       */
+/*   Updated: 2024/08/23 12:12:58 by lbrusa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@
  * This utility struct will hold the 4 values I wanna print
  */
 struct ScalarValue {
-
+	public:
+	std::string origInput;
 	unsigned char c;
 	int i;
 	float f;
@@ -31,7 +32,7 @@ struct ScalarValue {
 	bool charOverflow;
 
 	//constructor
-	ScalarValue(unsigned char c, int i, float f, double d, bool intOverflow, bool charOverflow);
+	ScalarValue(std::string origInput, unsigned char c, int i, float f, double d, bool intOverflow, bool charOverflow);
 
 	/* also use static functions visible in this file only */
 	static bool convert_if_is_int_or_char(const std::string& str);

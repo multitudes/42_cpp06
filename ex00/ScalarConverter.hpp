@@ -6,7 +6,7 @@
 /*   By: lbrusa <lbrusa@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 16:04:46 by lbrusa            #+#    #+#             */
-/*   Updated: 2024/08/19 17:22:17 by lbrusa           ###   ########.fr       */
+/*   Updated: 2024/08/23 11:12:40 by lbrusa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 
 /**
- * 
+ * @brief ScalarConverter class
  * 
  * I will use the class without instantiating it
  */

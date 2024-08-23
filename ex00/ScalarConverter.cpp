@@ -6,7 +6,7 @@
 /*   By: lbrusa <lbrusa@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 16:07:57 by lbrusa            #+#    #+#             */
-/*   Updated: 2024/08/19 17:30:48 by lbrusa           ###   ########.fr       */
+/*   Updated: 2024/08/23 11:11:32 by lbrusa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,9 @@ ScalarConverter& ScalarConverter::operator=(const ScalarConverter& assign) {
  */
 void ScalarConverter::convert(const std::string& str) {
 	std::cout << "\n========= converting >" << str << "< ==========" << std::endl;
-	if (ScalarValue::convert_if_is_int_or_char(str) || ScalarValue::convert_if_double(str) || ScalarValue::convert_if_float(str))
+	if (ScalarValue::convert_if_is_int_or_char(str) || \
+		ScalarValue::convert_if_double(str) || \
+		ScalarValue::convert_if_float(str))
 		return ;
 	std::cout << "Error: Not a valid type." << std::endl;
 }

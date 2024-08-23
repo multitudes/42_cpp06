@@ -6,7 +6,7 @@
 /*   By: lbrusa <lbrusa@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 17:22:36 by lbrusa            #+#    #+#             */
-/*   Updated: 2024/08/19 17:53:58 by lbrusa           ###   ########.fr       */
+/*   Updated: 2024/08/23 12:22:36 by lbrusa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,31 @@
 #include <math.h> 
 #include <cstdlib>
 #include <cerrno>
-
+#include <iomanip>
+#include <string>
 
 /**
  * @brief constructor
+ * 
+ * I use this struct to keep track of my conversions and overflows
  */
-ScalarValue::ScalarValue(unsigned char c, int i, float f, double d, bool intOverflow, bool charOverflow)
-	: c(c), i(i), f(f), d(d), intOverflow(intOverflow), charOverflow(charOverflow)  {};
+ScalarValue::ScalarValue(std::string origInput, unsigned char c, int i, float f, double d, bool intOverflow, bool charOverflow): origInput(origInput), c(c), i(i), f(f), d(d), intOverflow(intOverflow), charOverflow(charOverflow)  {};
+
+/**
+ * @brief count the number of decimal digits
+ */
+int countDigitsAfterDot(std::string str) {
+	int precision = 1;
+	std::size_t dotPos = str.find('.');
+	if (dotPos == std::string::npos) {
+		return 0;
+	}
+	precision = static_cast<int>(str.size() - dotPos - 1);
+	if (str.at(str.size() - 1) == 'f') {
+		precision -= 1;
+	}
+	return precision;
+}
 
 /**
  * @brief print the scalar value
@@ -32,6 +50,7 @@ ScalarValue::ScalarValue(unsigned char c, int i, float f, double d, bool intOver
  * automatically
  */
 void ScalarValue::printScalar(ScalarValue& value) {
+	// int precision = 1;
 	if (!value.charOverflow) {
 		if (isprint(value.c)) {
 			std::cout << "Char value: " << value.c << std::endl;
@@ -48,21 +67,28 @@ void ScalarValue::printScalar(ScalarValue& value) {
 	}
 	// Floats and doubles will automatically print inf in case of overflow
 	// and nan in case of nan
+	// Set precision to at least one digit after the decimal point
+    std::cout << std::setprecision(1) << std::fixed;
+
+    // Check if the value has more than one decimal digit
+    if (std::cout.precision() < countDigitsAfterDot(value.origInput)) {
+		// Increase precision to match the number of decimal digits
+        std::cout << std::setprecision(countDigitsAfterDot(value.origInput));
+    }
 	std::cout << "Float value: " << value.f << "f" << std::endl;
 	std::cout << "Double value: " << value.d << std::endl;
 }
 
 
-/**
- * @brief check if the string is an integer or a char
- * 
- * We will check if the string is an integer or a char and then cast it to the other types
- */
-bool ScalarValue::convert_if_is_int_or_char(const std::string& str) {
+bool ScalarValue::convert_if_is_int_or_char(const std::string &str)
+{
 	errno = 0;
 	char* endptr;
-	ScalarValue value(0, 0, 0, 0, false, false);
-
+	ScalarValue value(str, 0, 0, 0, 0, false, false);
+	// check if the string has a dot in it
+	if (str.find('.') != std::string::npos) {
+		return false;
+	}
 	// nan and inf are properties of float and double so we will not consider them
 	if (isinf(std::strtof(str.c_str(), &endptr)) || isnan(std::strtof(str.c_str(), &endptr))) {
 		return false;
@@ -79,13 +105,13 @@ bool ScalarValue::convert_if_is_int_or_char(const std::string& str) {
 			std::cout << "========= I assume the string is a char =========" << std::endl;
 			value.c = static_cast<unsigned char>(atoi(str.c_str()));
 			// this case is promotion so i dont need casting
-			value = ScalarValue(value.c, value.c, value.c, value.c, false, false);
+			value = ScalarValue(str, value.c, value.c, value.c, value.c, false, false);
 			printScalar(value);
 			return true;
 		}
 		// char overflows but int is fine
 		std::cout << "========= I assume the string is an int =========" << std::endl;
-		value = ScalarValue(' ', value.i, static_cast<float>(value.i), static_cast<double>(value.i), false, true);
+		value = ScalarValue(str, ' ', value.i, static_cast<float>(value.i), static_cast<double>(value.i), false, true);
 		printScalar(value);
 		return true;
 	}
@@ -100,7 +126,7 @@ bool ScalarValue::convert_if_is_int_or_char(const std::string& str) {
 bool ScalarValue::convert_if_double(const std::string& str) {
     errno = 0;
 	char* endptr;
-	ScalarValue value(0, 0, 0, 0, false, false);
+	ScalarValue value(str, 0, 0, 0, 0, false, false);
 
 	std::strtod(str.c_str(), &endptr);
 
@@ -110,14 +136,14 @@ bool ScalarValue::convert_if_double(const std::string& str) {
 		value.d = std::strtod(str.c_str(), &endptr);
 		if (value.d <  std::numeric_limits<int>::min() || value.d > std::numeric_limits<int>::max() || isnan(value.d) || isinf(value.d)) {
 			// int overflows
-			value = ScalarValue(' ', 0, static_cast<float>(value.d), value.d, true, true );
+			value = ScalarValue(str, ' ', 0, static_cast<float>(value.d), value.d, true, true );
 		} else {
 			// but maybe char is possible?
 			if (static_cast<int>(value.d) >= 0 && static_cast<int>(value.d) <= 255) {
 				value.c = static_cast<unsigned char>(static_cast<int>(value.d));
-				value = ScalarValue( value.c, static_cast<int>(value.d), static_cast<float>(value.d), value.d, false, false);
+				value = ScalarValue( str, value.c, static_cast<int>(value.d), static_cast<float>(value.d), value.d, false, false);
 			} else {
-			value = ScalarValue(' ', static_cast<int>(value.d), static_cast<float>(value.d), value.d, false, true);
+			value = ScalarValue(str, ' ', static_cast<int>(value.d), static_cast<float>(value.d), value.d, false, true);
 			}
 		}
 		printScalar(value);
@@ -138,7 +164,7 @@ bool ScalarValue::convert_if_double(const std::string& str) {
 bool ScalarValue::convert_if_float(const std::string& str) {
 	errno = 0;
   	char* endptr;
-	ScalarValue value(0, 0, 0, 0, false, false);
+	ScalarValue value(str, 0, 0, 0, 0, false, false);
 
 	// has to end with f
     if (str[str.size() - 1] != 'f') {
@@ -166,14 +192,14 @@ bool ScalarValue::convert_if_float(const std::string& str) {
 	if (static_cast<long>(value.f) > std::numeric_limits<int>::max() || \
 		static_cast<long>(value.f) < std::numeric_limits<int>::min()  || 
 		isnan(value.f) || isinf(value.f)) {
-		value = ScalarValue( 0, 0, value.f, value.f, true, true);
+		value = ScalarValue(str, 0, 0, value.f, value.f, true, true);
 	} else {
 		// but maybe char is possible?
 		if (static_cast<int>(value.f) >= 0 && static_cast<int>(value.f) <= 255) {
 			value.c = static_cast<unsigned char>(static_cast<int>(value.f));
-			value = ScalarValue( value.c, static_cast<int>(value.f), value.f, value.f, false, false);
+			value = ScalarValue(str, value.c, static_cast<int>(value.f), value.f, value.f, false, false);
 		} else {
-			value = ScalarValue( 0, static_cast<int>(value.f), value.f, value.f, false, true);
+			value = ScalarValue(str, 0, static_cast<int>(value.f), value.f, value.f, false, true);
 		}
 	}
 	printScalar(value);
