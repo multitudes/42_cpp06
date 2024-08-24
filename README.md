@@ -184,6 +184,55 @@ std::cout << "x: " << x << std::endl; // Undefined behavior: the value of x is n
 std::cout << "*q: " << *q << std::endl; // Undefined behavior: the value of *q is not guaranteed to be 24
 ```
 
+## Float and doubles bit mappings
+Check the blog article by Fabien Sanglard (link below) for the explanation of floats mappings...  for completeness I add the special cases here
+
+### Special Values in IEEE Floating-Point Arithmetic
+
+**IEEE 754** defines several special values in floating-point arithmetic to handle exceptional cases and represent certain mathematical concepts. These values are distinct from ordinary numbers and have specific interpretations:
+
+### Zero
+
+* **Representation:** An exponent of all 0s and a mantissa of all 0s.
+* **Values:** Both positive and negative zero (`+0` and `-0`) are distinct values, but they are considered equal in most comparisons.
+
+### Denormalized Numbers
+
+* **Representation:** An exponent of all 0s and a non-zero mantissa.
+* **Purpose:** Denormalized numbers are used to represent values that are smaller than the smallest normalized number. They do not have an implicit leading 1 before the binary point.
+
+### Infinity
+
+* **Representation:** An exponent of all 1s and a mantissa of all 0s.
+* **Values:** Both positive and negative infinity (`+∞` and `-∞`) are represented. Operations with infinity are defined in IEEE 754 to follow mathematical conventions.
+
+### Not a Number (NaN)
+
+* **Representation:** An exponent of all 1s, a zero sign bit, and a non-zero mantissa.
+* **Purpose:** `NaN` represents a result that cannot be represented as a valid number, such as the result of an invalid operation (e.g., dividing by zero). There are two types of `NaN`: signaling `NaN` (sNaN) and quiet `NaN` (qNaN).
+
+| Operation | Result |
+|---|---|
+| ±∞ ÷ ±∞ | NaN |
+| 0 ÷ ±∞ | 0 |
+| ±∞ × ±∞ | ±∞ (sign depends on operands) |
+| ±∞ × ±0 | NaN |
+| ±∞ ÷ ±0 | ±∞ (sign depends on operands) |
+| ±nonZero ÷ ±∞ | 0 |
+| ±∞ + ∞ | ±∞ (sign depends on operands) |
+| ±∞ - ∞ | ±∞ (sign depends on operands) |
+| ±∞ + ±finite | ±∞ (sign depends on operands) |
+| ±∞ - ±finite | ±∞ (sign depends on operands) |
+| ±0 ÷ ±0 | NaN |
+| ±∞ ÷ ±∞ | NaN |
+| ±∞ × 0 | NaN |
+| NaN == NaN | False |
+
+Additional Notes
+- NaN Propagation: If any operand in an operation is NaN, the result will also be NaN.
+- Sign Preservation: In operations involving infinity, the sign of the result is determined by the signs of the operands, following standard mathematical rules.
+- Indeterminate Forms: Some operations, such as 0/0 or ∞ - ∞, result in indeterminate forms and produce NaN as the result.
+
 # ex00 - static_cast
 
 >Write a class ScalarConverter that will contain only one static methods "convert" that will takes as parameter a string representation of a C++ literal in its most common form and output its value in the following serie of scalar types : char, int, float, double.  
