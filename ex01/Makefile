@@ -10,6 +10,9 @@ CXXFLAGS += -g3 -O0
 
 CXX = c++
 
+
+LDFLAGS = -std=c++98
+
 NAME= serializing
 ARGS=
 SRCS= main.cpp Serializer.cpp Data.cpp
@@ -18,7 +21,7 @@ OBJS= $(SRCS:.cpp=.o)
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
 # This is to recompile the .o files if the makefile changes
 %.o: %.cpp Makefile
