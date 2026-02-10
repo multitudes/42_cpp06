@@ -51,8 +51,8 @@ Integer infinity (just int max): 2147483647
 Negative integer infinity (just int min): -2147483648
 ```
 
-Surprisingly I cannot overlof a float or double, it will just return infinity.  
-But I can helas overflow an integer.
+Surprisingly I cannot overflow a float or double, it will just return infinity.  
+But I can however overflow an integer.
 
 ## What is NaN 
 NaN (Not a Number) is a special floating-point value used to represent undefined or non-representable results in mathematical operations. It can occur due to various reasons, such as:
@@ -162,7 +162,7 @@ int* mutableZ = const_cast<int*>(z); // Remove const qualifier - requires a poin
 ```
 
 ## Undefined behavior by casting
-There are things to be carefule when casting values.
+There are things to be careful when casting values.
 Example with reinterpret casting:
 ```cpp
 reinterpret_cast<int*>(0); // Undefined behavior: dereferencing a null pointer
@@ -187,6 +187,20 @@ std::cout << "*q: " << *q << std::endl; // Undefined behavior: the value of *q i
 ## Float and doubles bit mappings
 Check the blog article by Fabien Sanglard (link below) for the explanation of floats mappings...  for completeness I add the special cases here
 
+### IEEE 754 Bit Representation
+
+**Float (32-bit):**
+- 1 bit: sign
+- 8 bits: exponent
+- 23 bits: mantissa (significand/fraction)
+
+**Double (64-bit):**
+- 1 bit: sign
+- 11 bits: exponent
+- 52 bits: mantissa (significand/fraction)
+
+The additional exponent bits in doubles allow for a much larger range of numbers, while the additional mantissa bits provide greater precision.
+
 ### Special Values in IEEE Floating-Point Arithmetic
 
 **IEEE 754** defines several special values in floating-point arithmetic to handle exceptional cases and represent certain mathematical concepts. These values are distinct from ordinary numbers and have specific interpretations:
@@ -204,12 +218,16 @@ Check the blog article by Fabien Sanglard (link below) for the explanation of fl
 ### Infinity
 
 * **Representation:** An exponent of all 1s and a mantissa of all 0s.
+* **Bit pattern (float):** Sign bit (0 for +∞, 1 for -∞), exponent = 11111111 (255), mantissa = 00000000000000000000000 (all zeros)
+* **Bit pattern (double):** Sign bit (0 for +∞, 1 for -∞), exponent = 11111111111 (2047), mantissa = all zeros (52 bits)
 * **Values:** Both positive and negative infinity (`+∞` and `-∞`) are represented. Operations with infinity are defined in IEEE 754 to follow mathematical conventions.
 
 ### Not a Number (NaN)
 
-* **Representation:** An exponent of all 1s, a zero sign bit, and a non-zero mantissa.
-* **Purpose:** `NaN` represents a result that cannot be represented as a valid number, such as the result of an invalid operation (e.g., dividing by zero). There are two types of `NaN`: signaling `NaN` (sNaN) and quiet `NaN` (qNaN).
+* **Representation:** An exponent of all 1s and a non-zero mantissa. The sign bit can be 0 or 1.
+* **Bit pattern (float):** Sign bit (any), exponent = 11111111 (255), mantissa ≠ 0 (at least one bit is 1)
+* **Bit pattern (double):** Sign bit (any), exponent = 11111111111 (2047), mantissa ≠ 0 (at least one bit is 1)
+* **Purpose:** `NaN` represents a result that cannot be represented as a valid number, such as the result of an invalid operation (e.g., 0.0/0.0). There are two types of `NaN`: signaling `NaN` (sNaN) and quiet `NaN` (qNaN).
 
 | Operation | Result |
 |---|---|
@@ -281,7 +299,7 @@ float f = std::strtof(str.c_str(), &endptr);
 
 Similarly, `strtod()` will return `-std::numeric_limits<double>::infinity()` (or -inf) when the input string represents a number that negative and too large to be represented as a finite double value. This is referred to as underflow.
 
-Same for the floats. The `strtof()` will return `std::numeric_limits<float>::infinity()` (or `inf`) when the input string represents a number that is too large to be represented as a finite float value. This is often referred to as overflow. But as alias I can pass `inff` and -inff` to the float conversion function.
+Same for the floats. The `strtof()` will return `std::numeric_limits<float>::infinity()` (or `inf`) when the input string represents a number that is too large to be represented as a finite float value. This is often referred to as overflow. As an alternative I can pass `inff` and `-inff` to the float conversion function.
 
 ## is this an INT? a naive check and a better one
 How to check if a string is an integer in C++?  
@@ -334,7 +352,7 @@ static bool is_float(const std::string& str) {
     return *endptr == 'f';
 }
 ```
-Ops the above again was too simplistic... depending of the implementations the `strtof()` will not accept the 'f' at the end as part of the float? Also what if I pass ff or fff? I am ok if is an out of bound float.
+Oops, the above again was too simplistic... depending on the implementations the `strtof()` will not accept the 'f' at the end as part of the float? Also what if I pass ff or fff? I am ok if is an out of bound float.
 ```cpp
 // updated implementation
 static bool is_float(const std::string& str) {
@@ -352,7 +370,7 @@ static bool is_float(const std::string& str) {
 	if (modified_str.empty()) {
 		return false;
 	}
-	// verify that the string is a valid float/dounle
+	// verify that the string is a valid float/double
 	float value = std::strtof(modified_str.c_str(), &endptr);
 
 	// is the string a valid float then would not have any other chars in it
@@ -365,7 +383,7 @@ static bool is_float(const std::string& str) {
 
 So I found out that i did not have to hardcode the inf and nan values passed in the converter if i pass them to the float or double conversion functions. The values are not supposed to be char or int anyway.  
 
-The order nmaters though, so i check if int or char first (char being a substype kind of int) and then if it is a float or double.
+The order matters though, so i check if int or char first (char being a subtype kind of int) and then if it is a float or double.
 
 ### INT overflow? 
 
@@ -380,7 +398,7 @@ static bool is_int(const std::string& str) {
 but in the subject they really say this:
 > Allowed functions : Any function to convert from a string to an int, a float or a double. This will help, but won’t do the whole job...
 
-Ok... Ah these tricky subjects at 42... So apparently using strtoll ia not allowed? I can do without!
+Ok... Ah these tricky subjects at 42... So apparently using strtoll is not allowed? I can do without!
 
 I was thinking to convert my string to a double and then check for the overflow. But does my double have enough precision? We can print the precision of a float and a double with the following code:
 ```cpp
@@ -444,7 +462,7 @@ Serialization is the process of converting an object's state into a format that 
 
 The goal of serialization is to preserve the object's data and its structure so that it can be reconstructed later in the same or a different process. This is essential for tasks like saving data to disk, sending data over a network, or passing objects between different parts of a program.  
 
-In this exercise we use `reinterpret_cast` to convert a pointer to an integer value and vice versa. Not a difficult exercise, but to understand why we need to reinterptret_cast... the static_cast would npot be allowed in this case.  
+In this exercise we use `reinterpret_cast` to convert a pointer to an integer value and vice versa. Not a difficult exercise, but to understand why we need to reinterpret_cast... the static_cast would not be allowed in this case.  
 In C we would just cast. But in cpp everything has become more nuanced. To cast my data pointer:
 ```c
 // in C
@@ -457,10 +475,10 @@ reinterpret_cast<uintptr_t>(data);
 
 # ex02 - dynamic_cast
 
-> mplement a Base class that has a public virtual destructor only. Create three empty
+> Implement a Base class that has a public virtual destructor only. Create three empty
 classes A, B and C, that publicly inherit from Base. Implement the following functions:
 Base * generate(void);
-It randomly instanciates A, B or C and returns the instance as a Base pointer. Feel free
+It randomly instantiates A, B or C and returns the instance as a Base pointer. Feel free
 to use anything you like for the random choice implementation.
 void identify(Base* p);
 It prints the actual type of the object pointed to by p: "A", "B" or "C".
@@ -469,5 +487,5 @@ It prints the actual type of the object pointed to by p: "A", "B" or "C". Using 
 inside this function is forbidden.
 Including the typeinfo header is forbidden.
 
-This was farly straightforward. I have a base class `Base` and three derived classes `A`, `B` and `C`. 
+This was fairly straightforward. I have a base class `Base` and three derived classes `A`, `B` and `C`. 
 `dynamic_cast` is especially made for polymorphic classes. It is used to convert a pointer or reference to a base class to a pointer or reference to a derived class. If the conversion is not possible, it returns a null pointer in the case of a pointer, or throws an exception in the case of a reference.   
